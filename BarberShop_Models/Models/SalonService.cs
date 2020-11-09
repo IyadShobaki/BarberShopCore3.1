@@ -22,6 +22,8 @@ namespace BarberShop_Models.Models
         [Required]
         [Column(TypeName = "decimal(18,2)")]
         public decimal ServicePrice { get; set; }
+        // Enforce one to one relationship with Appointment table
+        public Appointment Appointment { get; set; }
 
     }
 }

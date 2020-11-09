@@ -16,6 +16,7 @@ namespace BarberShop_DataAccess.Data
 
         public DbSet<SalonService> SalonServices { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Customer> Customers { get; set; }
 
     }
 }
