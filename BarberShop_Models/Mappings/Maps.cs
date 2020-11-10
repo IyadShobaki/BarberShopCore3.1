@@ -12,6 +12,7 @@ namespace BarberShop_Models.Mappings
         public Maps()
         {
             CreateMap<SalonService, SalonServiceDTO>().ReverseMap();
+            CreateMap<Customer, CustomerDTO>().ReverseMap();
         }
     }
 }

@@ -23,7 +23,8 @@ namespace BarberShop_Models.Models
         [Column(TypeName = "decimal(18,2)")]
         public decimal ServicePrice { get; set; }
 
-        public ICollection<AppointmentSalonService> AppointmentSalonServices { get; set; }
+        public List<Appointment> Appointments { get; set; }
+        //public ICollection<AppointmentSalonService> AppointmentSalonServices { get; set; }
 
     }
 }

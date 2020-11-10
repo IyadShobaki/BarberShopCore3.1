@@ -14,13 +14,16 @@ namespace BarberShop_Models.Models
 
         //[ForeignKey("ApplicationUser")]
         //public string User_Id { get; set; }
-        //[Required]
         //public ApplicationUser ApplicationUser { get; set; }
+
         [ForeignKey("Customer")]
         public int Customer_Id { get; set; }
-        //[Required]
         public Customer Customer { get; set; }
 
-        public ICollection<AppointmentSalonService> AppointmentSalonServices { get; set; }
+        [ForeignKey("SalonService")]
+        public int SalonService_Id { get; set; }
+        public SalonService SalonService { get; set; }
+
+        //public ICollection<AppointmentSalonService> AppointmentSalonServices { get; set; }
     }
 }
