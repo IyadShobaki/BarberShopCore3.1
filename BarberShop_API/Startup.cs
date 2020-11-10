@@ -16,6 +16,8 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.IO;
 using BarberShop_Models.Models;
+using AutoMapper;
+using BarberShop_Models.Mappings;
 
 namespace BarberShop_API
 {
@@ -42,6 +44,8 @@ namespace BarberShop_API
                                 .AllowAnyMethod()
                                 .AllowAnyHeader());
             });
+
+            services.AddAutoMapper(typeof(Maps));
 
             services.AddSwaggerGen(c =>
             {

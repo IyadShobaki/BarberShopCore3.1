@@ -4,10 +4,5 @@
         <name>BarberShop_API</name>
     </assembly>
     <members>
-        <member name="T:BarberShop_API.Controllers.ValuesController">
-            <summary>
-            This a test controller
-            </summary>
-        </member>
     </members>
 </doc>
