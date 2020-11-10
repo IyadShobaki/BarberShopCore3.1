@@ -36,6 +36,12 @@ namespace BarberShop_API
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddCors(o => {
+                o.AddPolicy("CorsPolicy",
+                   builder => builder.AllowAnyOrigin()
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
+            });
 
             services.AddSwaggerGen(c =>
             {
@@ -78,7 +84,9 @@ namespace BarberShop_API
             });
 
             app.UseHttpsRedirection();
-            
+
+            app.UseCors("CorsPolicy");
+
             app.UseRouting();
 
             app.UseAuthentication();
