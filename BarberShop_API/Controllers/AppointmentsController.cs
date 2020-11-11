@@ -14,39 +14,39 @@ namespace BarberShop_API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class CustomersController : ControllerBase
+    public class AppointmentsController : ControllerBase
     {
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
 
-        public CustomersController(ApplicationDbContext db, IMapper mapper)
+        public AppointmentsController(ApplicationDbContext db, IMapper mapper)
         {
             _db = db;
             _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetCustomers()
+        public async Task<IActionResult> GetAppointments()
         {
-            List<Customer> customers = await _db.Customers.ToListAsync();
+            List<Appointment> appointments = await _db.Appointments.ToListAsync();
 
-            return Ok(customers);
+            return Ok(appointments);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCustomerById(int id)
+        public async Task<IActionResult> GetAppointmentById(int id)
         {
-            var customer = await _db.Customers.FindAsync(id);
-            if (customer == null)
+            var appointment = await _db.Appointments.FindAsync(id);
+            if (appointment == null)
             {
                 return NotFound();
             }
-            return Ok(customer);
+            return Ok(appointment);
         }
         [HttpPost]
-        public async Task<IActionResult> CreateUpdate([FromBody] CustomerDTO customerDTO)
+        public async Task<IActionResult> CreateUpdate([FromBody] AppointmentDTO appointmentDTO)
         {
-            if (customerDTO == null)
+            if (appointmentDTO == null)
             {
                 return BadRequest(ModelState);
             }
@@ -54,14 +54,20 @@ namespace BarberShop_API.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var customer = _mapper.Map<Customer>(customerDTO);
-            if (customer.Id == 0)
+
+            var isDateTimeAvailable = await _db.Appointments.AnyAsync(a => a.AppointmentDate == appointmentDTO.AppointmentDate);
+            if (isDateTimeAvailable)
             {
-                await _db.Customers.AddAsync(customer);
+                return BadRequest(ModelState);
+            }
+            var appointment = _mapper.Map<Appointment>(appointmentDTO);
+            if (appointment.Id == 0)
+            {
+                await _db.Appointments.AddAsync(appointment);
             }
             else
             {
-                _db.Customers.Update(customer);
+                _db.Appointments.Update(appointment);
             }
 
             var changes = await _db.SaveChangesAsync();
@@ -78,13 +84,13 @@ namespace BarberShop_API.Controllers
             {
                 return BadRequest();
             }
-            var isExist = await _db.Customers.AnyAsync(c => c.Id == id);
+            var isExist = await _db.Appointments.AnyAsync(a => a.Id == id);
             if (!isExist)
             {
                 return NotFound();
             }
-            var customer = await _db.Customers.FirstOrDefaultAsync(c => c.Id == id);
-            _db.Customers.Remove(customer);
+            var appointment = await _db.Appointments.FirstOrDefaultAsync(a => a.Id == id);
+            _db.Appointments.Remove(appointment);
             var changes = await _db.SaveChangesAsync();
             if (changes < 1)
             {
