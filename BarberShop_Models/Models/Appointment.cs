@@ -13,10 +13,6 @@ namespace BarberShop_Models.Models
         [Required]
         public DateTime AppointmentDate { get; set; }
 
-        //[ForeignKey("ApplicationUser")]
-        //public string User_Id { get; set; }
-        //public ApplicationUser ApplicationUser { get; set; }
-
         [ForeignKey("Customer")]
         public int Customer_Id { get; set; }
         public Customer Customer { get; set; }
@@ -24,8 +20,6 @@ namespace BarberShop_Models.Models
         [ForeignKey("SalonService")]
         public int SalonService_Id { get; set; }
         public SalonService SalonService { get; set; }
-
-        //public ICollection<AppointmentSalonService> AppointmentSalonServices { get; set; }
 
     }
 }

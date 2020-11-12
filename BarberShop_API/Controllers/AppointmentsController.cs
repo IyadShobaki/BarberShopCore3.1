@@ -27,20 +27,7 @@ namespace BarberShop_API.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAppointments()
-        {       
-            //List<Appointment> appointments = await _db.Appointments.ToListAsync();
-            //foreach (var appointment in appointments)
-            //{
-            //    // Least efficient 
-            //    //appointment.Customer = _db.Customers.FirstOrDefault(c => c.Id == appointment.Customer_Id);
-            //    //appointment.SalonService = _db.SalonServices.FirstOrDefault(s => s.Id == appointment.SalonService_Id);
-
-            //    // Explicit Loading (More efficient) 
-            //    //_db.Entry(appointment).Reference(c => c.Customer).Load();
-            //    //_db.Entry(appointment).Reference(c => c.SalonService).Load();
-            //}
-
-            //Use Eager Loading is the best
+        {           
             List<Appointment> appointments =
                 await _db.Appointments
                          .AsNoTracking() // To not include the list of appointment inside Customer class

@@ -24,7 +24,6 @@ namespace BarberShop_Models.Models
         public decimal ServicePrice { get; set; }
 
         public List<Appointment> Appointments { get; set; }
-        //public ICollection<AppointmentSalonService> AppointmentSalonServices { get; set; }
 
     }
 }

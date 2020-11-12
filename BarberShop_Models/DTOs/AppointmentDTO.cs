@@ -10,7 +10,9 @@ namespace BarberShop_Models.DTOs
         public int Id { get; set; }
         [Required]
         public DateTime AppointmentDate { get; set; }
+        [Required]
         public int Customer_Id { get; set; }
+        [Required]
         public int SalonService_Id { get; set; }
     }
 }
