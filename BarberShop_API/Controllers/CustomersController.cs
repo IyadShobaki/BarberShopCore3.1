@@ -28,7 +28,11 @@ namespace BarberShop_API.Controllers
         [HttpGet]
         public async Task<IActionResult> GetCustomers()
         {
-            List<Customer> customers = await _db.Customers.ToListAsync();
+            List<Customer> customers = await _db.Customers
+                            .AsNoTracking()
+                            .Include(a => a.Appointments)
+                            .ThenInclude(s => s.SalonService)
+                            .ToListAsync();
 
             return Ok(customers);
         }
@@ -36,7 +40,11 @@ namespace BarberShop_API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCustomerById(int id)
         {
-            var customer = await _db.Customers.FindAsync(id);
+            var customer = await _db.Customers//.FindAsync(id);
+                            .AsNoTracking()
+                            .Include(a => a.Appointments)
+                            .ThenInclude(s => s.SalonService)
+                            .FirstOrDefaultAsync(c => c.Id == id);
             if (customer == null)
             {
                 return NotFound();
@@ -69,7 +77,7 @@ namespace BarberShop_API.Controllers
             {
                 return StatusCode(500);
             }
-            return Ok();
+            return Ok(customer);
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

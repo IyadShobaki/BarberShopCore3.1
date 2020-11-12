@@ -38,7 +38,8 @@ namespace BarberShop_API
                     Configuration.GetConnectionString("DefaultConnection")));
             services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddCors(o => {
+            services.AddCors(o =>
+            {
                 o.AddPolicy("CorsPolicy",
                    builder => builder.AllowAnyOrigin()
                                 .AllowAnyMethod()
@@ -49,19 +50,26 @@ namespace BarberShop_API
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo 
-                {   
+                c.SwaggerDoc("v1", new OpenApiInfo
+                {
                     Title = "Barber Shop API",
                     Version = "v1",
                     Description = "This is an API for a barber shop"
                 });
-                
+
                 var xFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xPath = Path.Combine(AppContext.BaseDirectory, xFile);
                 c.IncludeXmlComments(xPath);
             });
 
-            services.AddControllers();
+            // After installing 'Microsoft.AspNetCore.Mvc.NewtonsoftJson' package
+            // to include related records (example -> Appointments and its Customer and SalonService)
+            services.AddControllers().AddNewtonsoftJson(options =>
+
+                options.SerializerSettings.ReferenceLoopHandling
+                = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

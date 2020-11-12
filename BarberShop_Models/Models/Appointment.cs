@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BarberShop_Models.DTOs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -25,5 +26,6 @@ namespace BarberShop_Models.Models
         public SalonService SalonService { get; set; }
 
         //public ICollection<AppointmentSalonService> AppointmentSalonServices { get; set; }
+
     }
 }

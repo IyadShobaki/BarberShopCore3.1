@@ -27,8 +27,27 @@ namespace BarberShop_API.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetAppointments()
-        {
-            List<Appointment> appointments = await _db.Appointments.ToListAsync();
+        {       
+            //List<Appointment> appointments = await _db.Appointments.ToListAsync();
+            //foreach (var appointment in appointments)
+            //{
+            //    // Least efficient 
+            //    //appointment.Customer = _db.Customers.FirstOrDefault(c => c.Id == appointment.Customer_Id);
+            //    //appointment.SalonService = _db.SalonServices.FirstOrDefault(s => s.Id == appointment.SalonService_Id);
+
+            //    // Explicit Loading (More efficient) 
+            //    //_db.Entry(appointment).Reference(c => c.Customer).Load();
+            //    //_db.Entry(appointment).Reference(c => c.SalonService).Load();
+            //}
+
+            //Use Eager Loading is the best
+            List<Appointment> appointments =
+                await _db.Appointments
+                         .AsNoTracking() // To not include the list of appointment inside Customer class
+                         .Include(c => c.Customer)
+                         .AsNoTracking() // To not include the list of appointment inside SalonService class
+                         .Include(s => s.SalonService)
+                         .ToListAsync();
 
             return Ok(appointments);
         }
@@ -36,7 +55,13 @@ namespace BarberShop_API.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetAppointmentById(int id)
         {
-            var appointment = await _db.Appointments.FindAsync(id);
+            var appointment = await _db.Appointments//.FindAsync(id)
+                         .AsNoTracking() // Its not tracking anyways but just in case
+                         .Include(c => c.Customer)
+                         .AsNoTracking()
+                         .Include(s => s.SalonService)
+                         .FirstOrDefaultAsync(a => a.Id == id);
+
             if (appointment == null)
             {
                 return NotFound();
@@ -75,7 +100,14 @@ namespace BarberShop_API.Controllers
             {
                 return StatusCode(500);
             }
-            return Ok();
+
+            // Return the appointment with the information
+            var appointmentWithInfo = await _db.Appointments
+                         .Include(c => c.Customer)
+                         .Include(s => s.SalonService)
+                         .FirstOrDefaultAsync(a => a.Id == appointment.Id);
+
+            return Ok(appointmentWithInfo);
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
