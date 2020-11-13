@@ -4,5 +4,30 @@
         <name>BarberShop_API</name>
     </assembly>
     <members>
+        <member name="T:BarberShop_API.Controllers.CustomersController">
+            <summary>
+            Endpoint used to interact with the Customers in Barber Shop Database
+            </summary>
+        </member>
+        <member name="M:BarberShop_API.Controllers.CustomersController.GetCustomers">
+            <summary>
+            Get All Customers
+            </summary>
+            <returns>List of Customers</returns>
+        </member>
+        <member name="M:BarberShop_API.Controllers.CustomersController.GetCustomerById(System.Int32)">
+            <summary>
+            Get Customer By Id
+            </summary>
+            <param name="id"></param>
+            <returns>Customer record</returns>
+        </member>
+        <member name="M:BarberShop_API.Controllers.CustomersController.CreateUpdate(BarberShop_Models.DTOs.CustomerDTO)">
+            <summary>
+            Create or update a customer
+            </summary>
+            <param name="customerDTO"></param>
+            <returns>Customer record</returns>
+        </member>
     </members>
 </doc>

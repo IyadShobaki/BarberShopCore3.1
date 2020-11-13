@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using BarberShop_DataAccess.Contracts;
 using BarberShop_DataAccess.Data;
 using BarberShop_Models.DTOs;
 using BarberShop_Models.Models;
@@ -12,93 +13,149 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BarberShop_API.Controllers
 {
+    /// <summary>
+    /// Endpoint used to interact with the Customers in Barber Shop Database
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [ProducesResponseType(StatusCodes.Status200OK)]
     public class CustomersController : ControllerBase
     {
-        private readonly ApplicationDbContext _db;
+        private readonly ICustomerRepository _customerRepository;
         private readonly IMapper _mapper;
 
-        public CustomersController(ApplicationDbContext db, IMapper mapper)
+        public CustomersController(ICustomerRepository customerRepository, IMapper mapper)
         {
-            _db = db;
+            _customerRepository = customerRepository;
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// Get All Customers
+        /// </summary>
+        /// <returns>List of Customers</returns>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetCustomers()
         {
-            List<Customer> customers = await _db.Customers
-                            .AsNoTracking()
-                            .Include(a => a.Appointments)
-                            .ThenInclude(s => s.SalonService)
-                            .ToListAsync();
-
-            return Ok(customers);
+            try
+            {
+                var customers = await _customerRepository.GetAll();
+                return Ok(customers);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Something went wrong. Please contact the Administrator"); // Internal Service Error
+            }
+          
         }
-
+        /// <summary>
+        /// Get Customer By Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Customer record</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetCustomerById(int id)
         {
-            var customer = await _db.Customers//.FindAsync(id);
-                            .AsNoTracking()
-                            .Include(a => a.Appointments)
-                            .ThenInclude(s => s.SalonService)
-                            .FirstOrDefaultAsync(c => c.Id == id);
-            if (customer == null)
+            try
             {
-                return NotFound();
+                var customer = await _customerRepository.GetById(id);
+                if (customer == null)
+                {
+                    return NotFound();
+                }
+                return Ok(customer);
             }
-            return Ok(customer);
+            catch (Exception)
+            {
+                return StatusCode(500, "Something went wrong. Please contact the Administrator");
+            }
+           
         }
+        /// <summary>
+        /// Create or update a customer
+        /// </summary>
+        /// <param name="customerDTO"></param>
+        /// <returns>Customer record</returns>
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateUpdate([FromBody] CustomerDTO customerDTO)
         {
-            if (customerDTO == null)
+            try
             {
-                return BadRequest(ModelState);
+                // The API will return Bad Request if 
+                // customerDTO is null or ModelState 
+                // is not valid without executing this method
+                // I think I don't need the following code
+                // start
+                if (customerDTO == null)
+                {
+                    return BadRequest(ModelState);
+                }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+                // end   --- Iyad
+                 
+                var customer = _mapper.Map<Customer>(customerDTO);
+                var response = await _customerRepository.CreateUpdate(customer);
+                if (response == null)
+                {
+                    return StatusCode(500, "Something went wrong. Please try again later!");
+                }
+                return Ok(response);
             }
-            if (!ModelState.IsValid)
+            catch (Exception)
             {
-                return BadRequest(ModelState);
+                return StatusCode(500, "Something went wrong. Please try again later!");
             }
-            var customer = _mapper.Map<Customer>(customerDTO);
-            if (customer.Id == 0)
-            {
-                await _db.Customers.AddAsync(customer);
-            }
-            else
-            {
-                _db.Customers.Update(customer);
-            }
-
-            var changes = await _db.SaveChangesAsync();
-            if (changes < 1)
-            {
-                return StatusCode(500);
-            }
-            return Ok(customer);
         }
+        /// <summary>
+        /// Delete a customer record
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> Delete(int id)
         {
-            if (id < 1)
+            try
             {
-                return BadRequest();
+                if (id < 1)
+                {
+                    return BadRequest();
+                }
+                //var isExist = await _customerRepository.IsExists(id);
+                //if (!isExist)
+                //{
+                //    return NotFound();
+                //}
+                var customer = await _customerRepository.GetById(id);
+                if (customer == null)
+                {
+                    return NotFound();
+                }
+                var isSuccess = await _customerRepository.Delete(customer);
+                if (!isSuccess)
+                {
+                    return StatusCode(500, "Something went wrong. Please try again later!");
+                }
+                return NoContent();
             }
-            var isExist = await _db.Customers.AnyAsync(c => c.Id == id);
-            if (!isExist)
+            catch (Exception)
             {
-                return NotFound();
+                return StatusCode(500, "Something went wrong. Please try again later!");
             }
-            var customer = await _db.Customers.FirstOrDefaultAsync(c => c.Id == id);
-            _db.Customers.Remove(customer);
-            var changes = await _db.SaveChangesAsync();
-            if (changes < 1)
-            {
-                return StatusCode(500);
-            }
-            return Ok();
+            
         }
     }
 }

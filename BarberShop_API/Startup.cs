@@ -18,6 +18,8 @@ using System.IO;
 using BarberShop_Models.Models;
 using AutoMapper;
 using BarberShop_Models.Mappings;
+using BarberShop_DataAccess.Contracts;
+using BarberShop_DataAccess.Services;
 
 namespace BarberShop_API
 {
@@ -61,6 +63,8 @@ namespace BarberShop_API
                 var xPath = Path.Combine(AppContext.BaseDirectory, xFile);
                 c.IncludeXmlComments(xPath);
             });
+
+            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             // After installing 'Microsoft.AspNetCore.Mvc.NewtonsoftJson' package
             // to include related records (example -> Appointments and its Customer and SalonService)
